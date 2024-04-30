@@ -12,7 +12,6 @@ function addDiv() {
         newDiv.className = "sub-main-div";
 
         newDiv.innerHTML = `
-        <div class="sub-sub-main-div">
             <div class="header">
                 <input class="main-input" type="text" placeholder="Enter course name">
             </div>
@@ -24,10 +23,6 @@ function addDiv() {
                 <input class="courses-inputs" type="text" placeholder="Course name">
                 <input class="courses-inputs" type="text" placeholder="Course name">
             </div>
-        </div>
-        <div>
-            <button class="simulation-button">Simulation</button>
-        </div>
         `;
 
         mainDiv.appendChild(newDiv);
