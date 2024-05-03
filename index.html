@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Managment</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" type="image/x-icon" href="graph.png"/>
+    <link rel="shortcut icon" type="image/x-icon" href="graph.png" />
+
 </head>
+
 <body>
-    <button class="add-button" onclick="addDiv()">
+    <button class="add-button" id="addBtn" onclick=" addDiv();">
         Add
     </button>
     <div class="main-div" id="mainDiv">
         <div class="sub-main-div">
-            <div class="sub-sub-main-div">
-                <div class="header">
+            <div class="sub-sub-main-div" id="inputsContainer">
+                <div class="header" id="u">
                     <input class="main-input" type="text" placeholder="Enter course name">
                 </div>
                 <hr>
-                <div class="content">
+                <div class="content" id="v">
                     <input class="courses-inputs" type="text" placeholder="Course name">
                     <input class="courses-inputs" type="text" placeholder="Course name">
                     <input class="courses-inputs" type="text" placeholder="Course name">
@@ -27,10 +30,729 @@
                 </div>
             </div>
             <div>
-                <button class="simulation-button">Simulation</button>
+                <a xlink:href="#simulate">
+                    <button class="simulation-button" id="simuBtn" onclick="graph()">Simulation</button></a>
             </div>
         </div>
     </div>
-    <script src="app.js"></script>    
+    <script src="app.js"></script>
+    <div class="wholeSimu" id="simulation-container">
+
+    </div>
+    <div class="wholeSimu" id="traverse-container">
+
+    </div>
+    <div class="wholeSimu" id="topologysort-container">
+
+    </div>
+
+    <div id="root" class="root"></div>
+
+
+
+    <svg>
+        <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"
+                markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#999" />
+            </marker>
+        </defs>
+    </svg>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script>
+
+    </script>
+
+    <script>
+
+
+
+
+
+        let adj = new Map();
+
+
+        let isVisited = new Map();
+
+        let arr = [];
+        let l = 0
+        function dfs(node) {
+            isVisited.set(node, true);
+            let neighbors = adj.get(node) || [];
+            for (let s of neighbors) {
+                if (!isVisited.get(s))
+                    dfs(s);
+            }
+        }
+
+        let z = 0;
+        function topology(node) {
+            isVisited.set(node, true);
+            let neighbors = adj.get(node) || [];
+            for (let s of neighbors) {
+                if (!isVisited.get(s))
+                    topology(s);
+            }
+            arr.push(node);
+        }
+
+
+
+        function traverse() {
+
+
+            for (let [key, value] of adj) {
+                if (!isVisited.get(key)) {
+                    dfs(key);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function graph() {
+            var addBtn = document.getElementById('addBtn');
+            addBtn.parentNode.removeChild(addBtn);
+            var simuBtn = document.getElementById('simuBtn');
+            simuBtn.parentNode.removeChild(simuBtn);
+            let wholeSimu = document.getElementById("simulation-container");
+
+            wholeSimu.innerHTML = `<div id="container">
+<h2>Graph</h2>
+</div>
+<div id="container">
+    <div id="simulation">
+
+
+
+    </div>
+    </div>
+    <br>
+<div id="buttonContainer">
+    
+    <a xlink:href="#simulation"><button id="traverseSimBtn" onclick="traverseSim();">Traverse</button></a>
+
+</div>`;
+
+
+            var courses = document.querySelectorAll(".header .main-input");
+            var prerequests = document.querySelectorAll(".content .courses-inputs");
+
+            let counter = 0;
+
+            for (var j = 0; j < prerequests.length; j++) {
+                if (courses[counter].value != '') {
+                    if (j % 5 == 0 && j != 0) {
+                        counter += 1;
+                    }
+
+                    if (!adj.has(courses[counter].value)) {
+                        adj.set(courses[counter].value, []);
+                    }
+                    if (prerequests[j].value != '') {
+                        adj.get(courses[counter].value).push(prerequests[j].value);
+                    }
+                }
+            }
+
+            var entriesIterator = adj.entries();
+
+            for (var entry of entriesIterator) {
+                var key = entry[0];
+                var value = entry[1];
+                console.log(key + ": " + value);
+            }
+
+            const links = [];
+
+            adj.forEach((values, key) => {
+                values.forEach(value => {
+                    links.push({ source: key, target: value.toString() });
+                });
+            });
+
+
+
+            var w = 900, h = 900;
+
+
+            var nodes = {};
+            links.forEach(function (link) {
+                link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
+                link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
+            });
+
+            var svg = d3.select("#simulation").append('svg').attr('width', '70%').attr('height', '70%').attr('viewBox', '0 0 1000 1000');
+            var force = d3.layout.force().size([w, h]).nodes(d3.values(nodes)).links(links).on("tick", tick).linkDistance(900).charge(-350).gravity(0.1).start();
+
+            var node = svg.selectAll('.node').data(force.nodes()).enter().append('g').attr('class', 'node').call(force.drag);
+
+            node.append('circle')
+                .style("fill", `#8f4646`)
+                .attr('r', 100).style('stroke-width', 2)
+                .attr('stroke-opacity', 0.3)
+                .style('stroke', "black");
+
+            node.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "-0.9em")
+                .style("fill", "white")
+                .style("font-size", "1.7em") // Adjust font size here
+                .text(function (d) { return d.name; });
+
+            var link = svg.selectAll('.link').data(links).enter().append('line').attr('class', 'link').style('stroke-width', 4).attr('marker-end', 'url(#arrow)');
+
+            function tick(e) {
+                node.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+                link.attr('x1', function (d) { return d.source.x; }).attr('y1', function (d) { return d.source.y; }).attr('x2', function (d) { return d.target.x; }).attr('y2', function (d) { return d.target.y; });
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+        async function traversal() {
+            arr = [];
+            traverse();
+            for (let [key, value] of isVisited) {
+                arr[l] = key;
+                l += 1;
+                console.log()
+            }
+
+            const runButton = document.getElementById('triangles');
+
+            var cnt = 0;
+
+
+            const colors = ['#F0F8FF', '#E6E6FA', '#E0FFFF', '#FFFFE0', '#FFB6C1',
+                '#90EE90', '#87CEFA', '#FFA07A', '#AFEEEE', '#F5FFFA',
+                '#F0FFF0', '#FFFAF0', '#FFF0F5', '#FFE4E1', '#FFF8DC',
+                '#EEE8AA', '#D3D3D3', '#FDF5E6', '#FFEFD5', '#FFFACD'
+            ];
+            let rando = async () => colors[Math.floor(Math.random() * colors.length)];
+
+            let simDiv = document.getElementById("traverseSimulation");
+
+
+            let arrowCode = `
+        <svg id="arrows" width="74" height="110" viewBox="0 0 74 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path id="arrow" d="M73.0607 52.9393C73.6464 53.5251 73.6464 54.4749 73.0607 55.0607L63.5147 64.6066C62.9289 65.1924 61.9792 65.1924 61.3934 64.6066C60.8076 64.0208 60.8076 63.0711 61.3934 62.4853L69.8787 54L61.3934 45.5147C60.8076 44.9289 60.8076 43.9792 61.3934 43.3934C61.9792 42.8076 62.9289 42.8076 63.5147 43.3934L73.0607 52.9393ZM0 52.5H72V55.5H0L0 52.5Z"/>
+        </svg>
+    `;
+
+            runButton.onclick = async (e) => {
+
+                if (cnt < arr.length && cnt == 0 && arr.length == 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivNode = document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+                    subSimDivNode.innerHTML = nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+
+                    var runButton = document.getElementById('runButton');
+                    runButton.parentNode.removeChild(runButton);
+
+
+                    var sortButton = document.createElement('button');
+                    var buttonContainer = document.getElementById('traBtnContainer');
+                    sortButton.id = "sortCourses"
+                    sortButton.textContent = 'Sort Courses';
+
+                    var anchor = document.createElement('a');
+                    anchor.setAttribute('xlink:href', '#simulation');
+
+
+                    anchor.append(sortButton);
+                    buttonContainer.append(sortButton);
+                    sortButton.onclick = async (e) => {
+                        topologySort();
+
+
+                        sortButton.parentNode.removeChild(sortButton);
+
+
+
+
+
+
+                    }
+                }
+
+                else if (arr.length && cnt == 0) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivNode = document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+                    subSimDivNode.innerHTML = nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+                }
+                else if (cnt < arr.length && cnt != arr.length - 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivArrow = document.createElement("div");
+                    subSimDivArrow.className = "subsSim";
+                    let subSimDivNode = document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+
+                    subSimDivArrow.innerHTML = arrowCode;
+                    simDiv.append(subSimDivArrow);
+
+
+                    subSimDivNode.innerHTML = nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+                }
+                else if (cnt == arr.length - 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivArrow = document.createElement("div");
+                    subSimDivArrow.className = "subsSim";
+                    let subSimDivNode = document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+
+                    subSimDivArrow.innerHTML = arrowCode;
+                    simDiv.append(subSimDivArrow);
+
+
+                    subSimDivNode.innerHTML = nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+                    var runButton = document.getElementById('runButton');
+                    runButton.parentNode.removeChild(runButton);
+
+
+                    var sortButton = document.createElement('button');
+                    var buttonContainer = document.getElementById('traBtnContainer');
+                    sortButton.id = "sortCourses"
+                    sortButton.textContent = 'Sort Courses';
+
+                    var anchor = document.createElement('a');
+                    anchor.setAttribute('xlink:href', '#simulation');
+
+
+                    anchor.append(sortButton);
+                    buttonContainer.append(sortButton);
+                    sortButton.onclick = async (e) => {
+                        topologySort();
+
+
+                        sortButton.parentNode.removeChild(sortButton);
+
+                    }
+
+
+
+
+                }
+
+            }
+
+
+
+
+
+
+        }
+
+        async function traverseSim() {
+            var traverseSimBtn = document.getElementById('traverseSimBtn');
+            traverseSimBtn.parentNode.removeChild(traverseSimBtn);
+            let traveCont = document.getElementById("traverse-container");
+
+            traveCont.innerHTML = `<div id="container">
+<h2>Traverse</h2>
+</div>
+<div id="container">
+   <div id="traverseSimulation">
+
+
+
+   </div>
+   </div>
+   <br>
+<div id="traBtnContainer">
+   
+   <svg id="runButton" width="76" height="100" viewBox="0 0 76 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <g id="triangles" onclick="traversal()">
+           <g id="darkTris">
+               <path id="darkTri" opacity="0.7"
+                   d="M52 48.768C53.3333 49.5378 53.3333 51.4623 52 52.2321L25.75 67.3875C24.4167 68.1573 22.75 67.195 22.75 65.6554L22.75 35.3445C22.75 33.8049 24.4167 32.8427 25.75 33.6125L52 48.768Z" />
+               <path id="darkTri2" opacity="0.7"
+                   d="M52 48.768C53.3333 49.5378 53.3333 51.4623 52 52.2321L25.75 67.3875C24.4167 68.1573 22.75 67.195 22.75 65.6554L22.75 35.3445C22.75 33.8049 24.4167 32.8427 25.75 33.6125L52 48.768Z" />
+           </g>
+           <g id="lightTris">
+               <path id="lightTri" opacity="0.7"
+                   d="M40 48.768C41.3333 49.5378 41.3333 51.4623 40 52.2321L13.75 67.3875C12.4167 68.1573 10.75 67.195 10.75 65.6554L10.75 35.3445C10.75 33.8049 12.4167 32.8427 13.75 33.6125L40 48.768Z" />
+           </g>
+       </g>
+   </svg>
+</div>`;
+
+
+
+
+
+
+        }
+
+
+        async function addNodesForSort() {
+
+            arr = [];
+            isVisited = new Map();
+            for (let [key, value] of adj) {
+                if (!isVisited.get(key)) {
+                    topology(key);
+                }
+
+
+
+
+            }
+
+
+
+
+            const runButton2 = await document.getElementById('trianglesForSort');
+
+            var cnt = 0;
+
+            const colors = await ['#F0F8FF', '#E6E6FA', '#E0FFFF', '#FFFFE0', '#FFB6C1',
+                '#90EE90', '#87CEFA', '#FFA07A', '#AFEEEE', '#F5FFFA',
+                '#F0FFF0', '#FFFAF0', '#FFF0F5', '#FFE4E1', '#FFF8DC',
+                '#EEE8AA', '#D3D3D3', '#FDF5E6', '#FFEFD5', '#FFFACD'
+            ];
+            let rando = async () => colors[Math.floor(Math.random() * colors.length)];
+
+            let simDiv = await document.getElementById("sortSimulation");
+
+
+            let arrowCode = `
+        <svg id="arrows" width="74" height="110" viewBox="0 0 74 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path id="arrow" d="M73.0607 52.9393C73.6464 53.5251 73.6464 54.4749 73.0607 55.0607L63.5147 64.6066C62.9289 65.1924 61.9792 65.1924 61.3934 64.6066C60.8076 64.0208 60.8076 63.0711 61.3934 62.4853L69.8787 54L61.3934 45.5147C60.8076 44.9289 60.8076 43.9792 61.3934 43.3934C61.9792 42.8076 62.9289 42.8076 63.5147 43.3934L73.0607 52.9393ZM0 52.5H72V55.5H0L0 52.5Z"/>
+        </svg>
+    `;
+
+            runButton2.onclick = async (e) => {
+                console.log(cnt)
+                console.log(arr.length)
+
+                if (cnt == 0 && arr.length == 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivNode = await document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+                    subSimDivNode.innerHTML = await nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+                    var runButton = document.getElementById('runButton');
+                    runButton.parentNode.removeChild(runButton);
+                }
+                else if (cnt == 0 && arr.length != 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivNode = await document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+                    subSimDivNode.innerHTML = await nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+                }
+                else if (cnt < arr.length && cnt != arr.length - 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivArrow = await document.createElement("div");
+                    subSimDivArrow.className = "subsSim";
+                    let subSimDivNode = await document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+
+                    subSimDivArrow.innerHTML = await arrowCode;
+                    simDiv.append(subSimDivArrow);
+
+
+                    subSimDivNode.innerHTML = await nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+
+
+
+
+
+
+
+                }
+
+                else if (cnt < arr.length && cnt == 0 && arr.length == 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivNode = await document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+                    subSimDivNode.innerHTML = await nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+                }
+                else if (cnt == arr.length - 1) {
+                    let randColor = await rando();
+                    let nodeCode = `
+        <svg id="nodes" width="120" height="106" viewBox="0 0 120 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="node">
+                <ellipse fill="${randColor}" cx="50%" cy="50%" rx="50%" ry="50%" />
+                <rect width="120" height="106"/>
+                <text id="nodeName" x="50% " y="50%">${arr[cnt]}</text>
+            </g>
+        </svg>
+    `;
+                    let subSimDivArrow = await document.createElement("div");
+                    subSimDivArrow.className = "subsSim";
+                    let subSimDivNode = await document.createElement("div");
+                    subSimDivNode.className = "subsSim";
+
+                    subSimDivArrow.innerHTML = await arrowCode;
+                    simDiv.append(subSimDivArrow);
+
+
+                    subSimDivNode.innerHTML = await nodeCode;
+                    randColor = await rando();
+                    document.documentElement.style.cssText = `
+    --node-color:${randColor};
+    
+    `;
+
+                    simDiv.append(subSimDivNode);
+
+                    cnt++;
+
+                    var runButton = document.getElementById('runButton');
+                    runButton.parentNode.removeChild(runButton);
+
+
+
+
+                }
+
+            }
+
+
+
+        }
+        async function topologySort() {
+            let wholeSimu = document.getElementById("topologysort-container");
+
+            wholeSimu.innerHTML = `<div id="container">
+<h2>Courses Order</h2>
+</div>
+<div id="container">
+   <div id="sortSimulation">
+
+
+
+   </div>
+   </div>
+   <br>
+<div id="buttonContainer">
+   
+   <svg id="runButton" width="76" height="100" viewBox="0 0 76 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <g id="trianglesForSort" onclick="addNodesForSort()">
+           <g id="darkTris">
+               <path id="darkTri" opacity="0.7"
+                   d="M52 48.768C53.3333 49.5378 53.3333 51.4623 52 52.2321L25.75 67.3875C24.4167 68.1573 22.75 67.195 22.75 65.6554L22.75 35.3445C22.75 33.8049 24.4167 32.8427 25.75 33.6125L52 48.768Z" />
+               <path id="darkTri2" opacity="0.7"
+                   d="M52 48.768C53.3333 49.5378 53.3333 51.4623 52 52.2321L25.75 67.3875C24.4167 68.1573 22.75 67.195 22.75 65.6554L22.75 35.3445C22.75 33.8049 24.4167 32.8427 25.75 33.6125L52 48.768Z" />
+           </g>
+           <g id="lightTris">
+               <path id="lightTri" opacity="0.7"
+                   d="M40 48.768C41.3333 49.5378 41.3333 51.4623 40 52.2321L13.75 67.3875C12.4167 68.1573 10.75 67.195 10.75 65.6554L10.75 35.3445C10.75 33.8049 12.4167 32.8427 13.75 33.6125L40 48.768Z" />
+           </g>
+       </g>
+   </svg>
+</div>`;
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+
+
 </body>
+
 </html>
