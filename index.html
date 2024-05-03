@@ -94,6 +94,7 @@
         let isVisited = new Map();
 
         let arr = [];
+        let cnt=0;
         let l = 0
         function dfs(node) {
             isVisited.set(node, true);
@@ -146,6 +147,7 @@
             var simuBtn = document.getElementById('simuBtn');
             simuBtn.parentNode.removeChild(simuBtn);
             let wholeSimu = document.getElementById("simulation-container");
+            wholeSimu.classList.add('animate');
 
             wholeSimu.innerHTML = `<div id="container">
 <h2>Graph</h2>
@@ -250,38 +252,41 @@
 
 
         }
-
-        async function traversal() {
-            arr = [];
-            traverse();
+function finTraverse(){
+    traverse();
             for (let [key, value] of isVisited) {
                 arr[l] = key;
                 l += 1;
-                console.log()
             }
-
-            const runButton = document.getElementById('triangles');
-
-            var cnt = 0;
-
-
-            const colors = ['#F0F8FF', '#E6E6FA', '#E0FFFF', '#FFFFE0', '#FFB6C1',
+}
+const colors = ['#F0F8FF', '#E6E6FA', '#E0FFFF', '#FFFFE0', '#FFB6C1',
                 '#90EE90', '#87CEFA', '#FFA07A', '#AFEEEE', '#F5FFFA',
                 '#F0FFF0', '#FFFAF0', '#FFF0F5', '#FFE4E1', '#FFF8DC',
                 '#EEE8AA', '#D3D3D3', '#FDF5E6', '#FFEFD5', '#FFFACD'
             ];
             let rando = async () => colors[Math.floor(Math.random() * colors.length)];
 
-            let simDiv = document.getElementById("traverseSimulation");
-
-
-            let arrowCode = `
+            const arrowCode = `
         <svg id="arrows" width="74" height="110" viewBox="0 0 74 110" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path id="arrow" d="M73.0607 52.9393C73.6464 53.5251 73.6464 54.4749 73.0607 55.0607L63.5147 64.6066C62.9289 65.1924 61.9792 65.1924 61.3934 64.6066C60.8076 64.0208 60.8076 63.0711 61.3934 62.4853L69.8787 54L61.3934 45.5147C60.8076 44.9289 60.8076 43.9792 61.3934 43.3934C61.9792 42.8076 62.9289 42.8076 63.5147 43.3934L73.0607 52.9393ZM0 52.5H72V55.5H0L0 52.5Z"/>
         </svg>
     `;
+        async function traversal() {
+            
+            
 
-            runButton.onclick = async (e) => {
+
+            
+
+
+            
+
+            let simDiv = document.getElementById("traverseSimulation");
+
+
+            
+
+            
 
                 if (cnt < arr.length && cnt == 0 && arr.length == 1) {
                     let randColor = await rando();
@@ -312,29 +317,10 @@
                     runButton.parentNode.removeChild(runButton);
 
 
-                    var sortButton = document.createElement('button');
                     var buttonContainer = document.getElementById('traBtnContainer');
-                    sortButton.id = "sortCourses"
-                    sortButton.textContent = 'Sort Courses';
+                    buttonContainer.innerHTML=`<a xlink:href="#simulation" ><button id="sortCourses" onclick="topologySort()">Sort Courses</button></a>`;
 
-                    var anchor = document.createElement('a');
-                    anchor.setAttribute('xlink:href', '#simulation');
-
-
-                    anchor.append(sortButton);
-                    buttonContainer.append(sortButton);
-                    sortButton.onclick = async (e) => {
-                        topologySort();
-
-
-                        sortButton.parentNode.removeChild(sortButton);
-
-
-
-
-
-
-                    }
+                    
                 }
 
                 else if (arr.length && cnt == 0) {
@@ -427,31 +413,16 @@
                     runButton.parentNode.removeChild(runButton);
 
 
-                    var sortButton = document.createElement('button');
                     var buttonContainer = document.getElementById('traBtnContainer');
-                    sortButton.id = "sortCourses"
-                    sortButton.textContent = 'Sort Courses';
+                    buttonContainer.innerHTML=`<a xlink:href="#simulation" ><button id="sortCourses" onclick="topologySort()">Sort Courses</button></a>`;
 
-                    var anchor = document.createElement('a');
-                    anchor.setAttribute('xlink:href', '#simulation');
-
-
-                    anchor.append(sortButton);
-                    buttonContainer.append(sortButton);
-                    sortButton.onclick = async (e) => {
-                        topologySort();
-
-
-                        sortButton.parentNode.removeChild(sortButton);
-
-                    }
 
 
 
 
                 }
 
-            }
+            
 
 
 
@@ -461,9 +432,13 @@
         }
 
         async function traverseSim() {
+            arr = [];
+             cnt = 0;
+             finTraverse();
             var traverseSimBtn = document.getElementById('traverseSimBtn');
             traverseSimBtn.parentNode.removeChild(traverseSimBtn);
             let traveCont = document.getElementById("traverse-container");
+            traveCont.classList.add('animate');
 
             traveCont.innerHTML = `<div id="container">
 <h2>Traverse</h2>
@@ -501,10 +476,8 @@
 
         }
 
-
-        async function addNodesForSort() {
-
-            arr = [];
+    
+        function varifiySort(){
             isVisited = new Map();
             for (let [key, value] of adj) {
                 if (!isVisited.get(key)) {
@@ -515,31 +488,29 @@
 
 
             }
+        }
+        
+
+        async function addNodesForSort() {
+            
+            
+            
 
 
 
 
-            const runButton2 = await document.getElementById('trianglesForSort');
+            
 
-            var cnt = 0;
+            
 
-            const colors = await ['#F0F8FF', '#E6E6FA', '#E0FFFF', '#FFFFE0', '#FFB6C1',
-                '#90EE90', '#87CEFA', '#FFA07A', '#AFEEEE', '#F5FFFA',
-                '#F0FFF0', '#FFFAF0', '#FFF0F5', '#FFE4E1', '#FFF8DC',
-                '#EEE8AA', '#D3D3D3', '#FDF5E6', '#FFEFD5', '#FFFACD'
-            ];
-            let rando = async () => colors[Math.floor(Math.random() * colors.length)];
-
-            let simDiv = await document.getElementById("sortSimulation");
+            
+            
+            let simDiv = document.getElementById("sortSimulation");
 
 
-            let arrowCode = `
-        <svg id="arrows" width="74" height="110" viewBox="0 0 74 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path id="arrow" d="M73.0607 52.9393C73.6464 53.5251 73.6464 54.4749 73.0607 55.0607L63.5147 64.6066C62.9289 65.1924 61.9792 65.1924 61.3934 64.6066C60.8076 64.0208 60.8076 63.0711 61.3934 62.4853L69.8787 54L61.3934 45.5147C60.8076 44.9289 60.8076 43.9792 61.3934 43.3934C61.9792 42.8076 62.9289 42.8076 63.5147 43.3934L73.0607 52.9393ZM0 52.5H72V55.5H0L0 52.5Z"/>
-        </svg>
-    `;
+        
 
-            runButton2.onclick = async (e) => {
+         
                 console.log(cnt)
                 console.log(arr.length)
 
@@ -700,9 +671,15 @@
 
 
 
-        }
+        
         async function topologySort() {
+            var sortButton = document.getElementById('sortCourses')
+                        sortButton.parentNode.removeChild(sortButton);
+            cnt = 0;
+        arr = [];
+        varifiySort();
             let wholeSimu = document.getElementById("topologysort-container");
+            wholeSimu.classList.add('animate');
 
             wholeSimu.innerHTML = `<div id="container">
 <h2>Courses Order</h2>
