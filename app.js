@@ -35,3 +35,4 @@ function addDiv() {
         alert("Maximum number of courses reached!");
     }
 }
+
