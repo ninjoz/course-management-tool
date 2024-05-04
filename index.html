@@ -40,6 +40,8 @@
         </div>
     </div>
     <script src="app.js"></script>
+
+    
     <div class="wholeSimu" id="simulation-container">
 
     </div>
@@ -54,7 +56,7 @@
 
 
 
-    <svg>
+    <svg width="0" height="0" style="position:absolute;">
         <defs>
             <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"
                 markerUnits="strokeWidth">
@@ -78,10 +80,7 @@
 
 
     <script src="//d3js.org/d3.v3.min.js"></script>
-    <script>
-
-    </script>
-
+    
     <script>
 
 
@@ -143,113 +142,122 @@
 
         function graph() {
             var addBtn = document.getElementById('addBtn');
-            addBtn.parentNode.removeChild(addBtn);
-            var simuBtn = document.getElementById('simuBtn');
-            simuBtn.parentNode.removeChild(simuBtn);
-            let wholeSimu = document.getElementById("simulation-container");
-            wholeSimu.classList.add('animate');
+addBtn.parentNode.removeChild(addBtn);
+var simuBtn = document.getElementById('simuBtn');
+simuBtn.parentNode.removeChild(simuBtn);
 
-            wholeSimu.innerHTML = `<div id="container">
-<h2>Graph</h2>
-</div>
-<div id="container">
-    <div id="simulation">
+let wholeSimu = document.getElementById("simulation-container");
+wholeSimu.classList.add('animate');
 
-
-
+wholeSimu.innerHTML = `
+    <div id="container">
+        <h2>Graph</h2>
     </div>
+    <div id="container">
+        <div id="simulation">
+        </div>
     </div>
     <br>
-<div id="buttonContainer">
-    
-    <a xlink:href="#simulation"><button id="traverseSimBtn" onclick="traverseSim();">Traverse</button></a>
+    <div id="buttonContainer">
+        <a xlink:href="#simulation"><button id="traverseSimBtn" onclick="traverseSim();">Traverse</button></a>
+    </div>
+`;
 
-</div>`;
+var courses = document.querySelectorAll(".header .main-input");
+var prerequisites = document.querySelectorAll(".content .courses-inputs");
 
+let counter = 0;
+for (var j = 0; j < prerequisites.length; j++) {
+    if (courses[counter].value !== '' && prerequisites[j].value !== '') {
+        if (j % 5 === 0 && j !== 0) {
+            counter++;
+        }
 
-            var courses = document.querySelectorAll(".header .main-input");
-            var prerequests = document.querySelectorAll(".content .courses-inputs");
+        if (!adj.has(courses[counter].value)) {
+            adj.set(courses[counter].value, []);
+        }
 
-            let counter = 0;
+        adj.get(courses[counter].value).push(prerequisites[j].value);
+    }
+}
 
-            for (var j = 0; j < prerequests.length; j++) {
-                if (courses[counter].value != '') {
-                    if (j % 5 == 0 && j != 0) {
-                        counter += 1;
-                    }
+const links = [];
 
-                    if (!adj.has(courses[counter].value)) {
-                        adj.set(courses[counter].value, []);
-                    }
-                    if (prerequests[j].value != '') {
-                        adj.get(courses[counter].value).push(prerequests[j].value);
-                    }
-                }
-            }
+adj.forEach((values, key) => {
+    values.forEach(value => {
+        links.push({ source: key, target: value.toString() });
+    });
+});
 
-            var entriesIterator = adj.entries();
+var nodes = {};
+links.forEach(function(link) {
+    link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
+    link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
+});
 
-            for (var entry of entriesIterator) {
-                var key = entry[0];
-                var value = entry[1];
-                console.log(key + ": " + value);
-            }
+var svg = d3.select("#simulation").append('svg')
+    .attr('width', '70%')
+    .attr('height', '70%')
+    .attr('viewBox', '0 0 1000 1000');
 
-            const links = [];
+var defs = svg.append("defs");
 
-            adj.forEach((values, key) => {
-                values.forEach(value => {
-                    links.push({ source: key, target: value.toString() });
-                });
-            });
+defs.append("marker")
+    .attr("id", "arrow")
+    .attr("markerWidth", 10)
+    .attr("markerHeight", 10)
+    .attr("refX", 8)
+    .attr("refY", 3)
+    .attr("orient", "auto")
+    .attr("markerUnits", "strokeWidth")
+    .append("path")
+    .attr("d", "M0,0 L0,6 L9,3 z")
+    .attr("fill", "#999");
 
+var force = d3.layout.force()
+    .size([900, 900])
+    .nodes(d3.values(nodes))
+    .links(links)
+    .on("tick", tick)
+    .linkDistance(500)
+    .charge(-2500)
+    .gravity(0.1)
+    .start();
 
+var node = svg.selectAll('.node')
+    .data(force.nodes())
+    .enter().append('g')
+    .attr('class', 'node')
+    .call(force.drag);
 
-            var w = 900, h = 900;
+node.append('circle')
+    .style("fill", `#8f4646`)
+    .attr('r', 100)
+    .style('stroke-width', 2)
+    .attr('stroke-opacity', 0.3)
+    .style('stroke', "black");
 
+node.append("text")
+    .attr("text-anchor", "middle")
+    .attr("dy", "-0.9em")
+    .style("fill", "white")
+    .style("font-size", "1.7em") 
+    .text(function(d) { return d.name; });
 
-            var nodes = {};
-            links.forEach(function (link) {
-                link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
-                link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
-            });
+var link = svg.selectAll('.link')
+    .data(links)
+    .enter().append('line')
+    .attr('class', 'link')
+    .style('stroke-width', 4)
+    .attr('marker-end', 'url(#arrow)');
 
-            var svg = d3.select("#simulation").append('svg').attr('width', '70%').attr('height', '70%').attr('viewBox', '0 0 1000 1000');
-            var force = d3.layout.force().size([w, h]).nodes(d3.values(nodes)).links(links).on("tick", tick).linkDistance(900).charge(-350).gravity(0.1).start();
-
-            var node = svg.selectAll('.node').data(force.nodes()).enter().append('g').attr('class', 'node').call(force.drag);
-
-            node.append('circle')
-                .style("fill", `#8f4646`)
-                .attr('r', 100).style('stroke-width', 2)
-                .attr('stroke-opacity', 0.3)
-                .style('stroke', "black");
-
-            node.append("text")
-                .attr("text-anchor", "middle")
-                .attr("dy", "-0.9em")
-                .style("fill", "white")
-                .style("font-size", "1.7em") // Adjust font size here
-                .text(function (d) { return d.name; });
-
-            var link = svg.selectAll('.link').data(links).enter().append('line').attr('class', 'link').style('stroke-width', 4).attr('marker-end', 'url(#arrow)');
-
-            function tick(e) {
-                node.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
-                link.attr('x1', function (d) { return d.source.x; }).attr('y1', function (d) { return d.source.y; }).attr('x2', function (d) { return d.target.x; }).attr('y2', function (d) { return d.target.y; });
-            }
-
-
-
-
-
-
-
-
-
-
-
-
+function tick(e) {
+    node.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+    link.attr('x1', function(d) { return d.source.x; })
+        .attr('y1', function(d) { return d.source.y; })
+        .attr('x2', function(d) { return d.target.x; })
+        .attr('y2', function(d) { return d.target.y; });
+}
 
         }
 function finTraverse(){
