@@ -1,12 +1,11 @@
-.add-button{
+.add-button, .simulation-button{
     display: inline-block;
     width: 120px;
     height: 35px;
     border-radius: 50px;
-    background-color: #04AA6D;
+    background-color: #6b3225;
     border: none;
     color: white;
-    padding: 10px 32px;
     text-align: center;
     cursor: pointer;
     font-weight: bold;
@@ -15,7 +14,6 @@
 }
 
 .add-button:hover{
-    opacity: 0.8;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.15);
 }
 
@@ -23,19 +21,20 @@
     opacity: 0.5;
 }
 
+.simulation-button:hover{
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+    .simulation-button:active{
+        opacity: 0.7;
+    }
+
 .main-div{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     margin: 60px;
 }
-
-/* .sub-main-div{
-    display: flex;
-    flex-direction: column;
-    width: 250px;
-    height: 390px;
-} */
 
 .sub-main-div{
     display: flex;
@@ -51,6 +50,7 @@
 }
 
 .main-input, .courses-inputs {
+    background-color: #efefefd3;
     width: 100%;
     padding: 11px;
     box-sizing: border-box;
@@ -60,8 +60,17 @@
 }
 
 .main-input{
-    background-color: rgb(129, 183, 222);
+    background-color: rgba(220, 120, 120, 0.7);
+    color: #FAFAFA;
     padding: 15px;
+}
+
+.main-input::placeholder{
+    color: #e5c9c2;
+}
+
+.courses-inputs::placeholder{
+    color: #696866b0;
 }
 
 .header {
@@ -84,28 +93,6 @@ hr{
     height: 1px;
     margin: 0%;
 }
-
-.simulation-button{
-    width: 120px;
-    height: 35px;
-    border-radius: 50px;
-    background-color: #03abed;
-    border: none;
-    color: white;
-    padding: 25%px 25%;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
-    margin: 30px;
-}
-
-.simulation-button:hover{
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.15);
-}
-
-    .simulation-button:active{
-        opacity: 0.7;
-    }
 
 
 
