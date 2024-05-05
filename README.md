@@ -14,14 +14,19 @@ The application allows users to schedule courses by considering their prerequisi
 
 1. **Course Data Input Method:**
    - Users can input course data and their prerequisites easily through the application interface.
+   ![Interface](https://github.com/ninjoz/course-management-tool/assets/100297367/0484ae21-46d5-45fa-85c8-11b359e03d6f)
+   ![Interface](https://github.com/ninjoz/course-management-tool/assets/100297367/f80c0ef3-1950-4f88-850a-55a0deb42779)
 
 2. **Data Simulation:**
    - The application provides simulation features for the input data, including:
-     - Visualization of the input data using the D3 Force Directed Layout Graph.
-     - DFS traversal on the input data to analyze dependencies.
+   - Visualization of the input data using the D3 Force Directed Layout Graph.
+   - DFS traversal on the input data to analyze dependencies.
+   ![Graph](https://github.com/ninjoz/course-management-tool/assets/100297367/79b43c98-6efc-4bcb-9801-9114024e2f9f)
+   ![Traverse](https://github.com/ninjoz/course-management-tool/assets/100297367/10c451c4-74f9-48f5-a845-83f7ae41035d)
 
 3. **Optimized Course Schedule:**
    - The application calculates and presents the correct order of courses based on their prerequisites, ensuring an optimized course schedule.
+   ![Order](https://github.com/ninjoz/course-management-tool/assets/100297367/923de0ee-13f0-42df-9b95-92a5b0a40f71)
 
 ## Technologies Used
 
@@ -48,9 +53,3 @@ Contributions are welcome! If you'd like to contribute to the project, please fo
 2. Create a new branch for your feature or bug fix.
 3. Make your changes and commit them.
 4. Push to your fork and submit a pull request.
-
-![Interface](https://github.com/ninjoz/course-management-tool/assets/100297367/0484ae21-46d5-45fa-85c8-11b359e03d6f)
-![Interface](https://github.com/ninjoz/course-management-tool/assets/100297367/f80c0ef3-1950-4f88-850a-55a0deb42779)
-![Graph](https://github.com/ninjoz/course-management-tool/assets/100297367/79b43c98-6efc-4bcb-9801-9114024e2f9f)
-![Traverse](https://github.com/ninjoz/course-management-tool/assets/100297367/10c451c4-74f9-48f5-a845-83f7ae41035d)
-![Order](https://github.com/ninjoz/course-management-tool/assets/100297367/923de0ee-13f0-42df-9b95-92a5b0a40f71)
